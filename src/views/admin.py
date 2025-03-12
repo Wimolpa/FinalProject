@@ -117,7 +117,7 @@ def insert_sensor():
         mycursor = mysql.connection.cursor()
 
         mycursor.execute("SELECT * FROM sensor WHERE node_name = %s AND user_id = %s", (node_name, userId))
-        existing_sensor = mycursor.fetchone()  # ดึงข้อมูลเซนเซอร์ที่มีอยู่
+        existing_sensor = mycursor.fetchone()  
 
         if existing_sensor:
             mycursor = mysql.connection.cursor()

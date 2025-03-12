@@ -66,9 +66,9 @@ def login_route():
         password = request.form['password']
         sensor = []
         fire_location = []
-        # ใช้ with statement เพื่อเปิด cursor
+        
         with mysql.connection.cursor() as cursor:
-            # Query เพื่อดึง username, password และ role ของผู้ใช้
+           
             cursor.execute("SELECT Id, username, password, role FROM users WHERE username = %s", (username,))
             user = cursor.fetchone()
 
@@ -83,25 +83,25 @@ def login_route():
                 role = user[3]  
                 id = user[0]
 
-                # เข้ารหัส password ที่กรอกมา
+                
                 password_hashed = hashlib.md5(password.encode()).hexdigest()
 
                 
-                # ตรวจสอบว่า password ที่เข้ารหัสตรงกับข้อมูลในฐานข้อมูลหรือไม่
+                
                 if hashed_password == password_hashed:
                     print('pass', hashed_password, password_hashed)
                     
-                    # เก็บข้อมูลผู้ใช้ใน session
+                   
                     session['username'] = username
                     session['role'] = role  
                     
-                    # ตรวจสอบ role และเปลี่ยนเส้นทางไปยังหน้าตาม role ของผู้ใช้
+                   
                     if role == 'admin':
                         return redirect(url_for('admin.adminpage_user'))  
                     elif role == 'user':
 
                             with mysql.connection.cursor() as cursor:
-                    # ลบข้อมูลทั้งหมดในตาราง fire_location ตาม user_id
+                  
                                 cursor.execute("DELETE FROM fire_location WHERE user_id = %s", (id,))
                                 mysql.connection.commit()
 

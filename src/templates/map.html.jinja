@@ -124,7 +124,6 @@
             document.getElementById("myDropdown").classList.toggle("show");
         }
 
-        // Close the dropdown if the user clicks outside of it
         window.onclick = function (event) {
             if (!event.target.matches('.dropbtn')) {
                 var dropdowns = document.getElementsByClassName("dropdown-content");
@@ -138,12 +137,12 @@
         }
 
 
-        // Function to close the modal
+
         function closeModal() {
             document.getElementById("myModal").style.display = "none";
         }
 
-        // Close the modal if clicked outside
+
         window.onclick = function (event) {
             var modal = document.getElementById("myModal");
             if (event.target == modal) {
@@ -217,7 +216,7 @@
                         </tbody>
                     </table>
 
-                    <!-- Pagination controls -->
+
                     <div id="pagination" style="text-align: center; margin: 10px;">
                         <button id="prevBtn" class="btn btn-secondary" disabled>ก่อนหน้า</button>
                         <button id="nextBtn" class="btn btn-secondary">ถัดไป</button>
@@ -266,9 +265,9 @@
 
         // ฟังก์ชันแสดงป็อปอัพเซ็นเซอร์
         document.getElementById("showSensors").addEventListener("click", function () {
-            $('#modalSensor').modal('show'); // แสดงโมดัลที่มีตารางเซ็นเซอร์
-            currentPage = 1; // รีเซ็ตหน้าเป็นหน้าแรก
-            showPage(currentPage); // แสดงหน้าแรกของตาราง
+            $('#modalSensor').modal('show');
+            currentPage = 1;
+            showPage(currentPage);
         });
 
         function showPage(page) {
@@ -324,7 +323,7 @@
         const fire_location = {{ fire_location | tojson }};
         //console.log(data);
         function initMap() {
-            const centerCoordinates = { lat: data[0][2], lng: data[0][3] }; // Map center coordinates
+            const centerCoordinates = { lat: data[0][2], lng: data[0][3] };
             const map = new google.maps.Map(document.getElementById('map'), {
                 zoom: 12,
                 center: centerCoordinates,
@@ -431,9 +430,8 @@
         }
 
     </script>
-    <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBtpuNRPRhjubNotVoqEKJO8pFxI2woX8A&callback=initMap">
-        </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=&callback=initMap">
+    </script>
 
     <script>
 
