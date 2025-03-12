@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            background-color: #212121;
+            background-size: cover;
+            background-position: center;
+            min-height: 600px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+</head>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<body>
+
+    <div class="appbar">
+        <a href="{{ url_for('home.homepage') }}" class="column">ติดต่อ</a>
+        <a href="{{ url_for('home.homepage') }}" class="column">หน้าหลัก</a>
+    </div>
+
+    <div class="container">
+        <form action="{{ url_for('register.insert')}}" method="post" class="form-box">
+            <div class="form-link">
+                <i class="material-icons" style='font-size:70px'>lock</i>
+            </div>
+            <div class="form-group form-inline">
+                <input type="text" name="name" class="form-control" id="name" placeholder="ชื่อ-นามสกุล">
+            </div>
+            <div class="form-group form-inline">
+                <input type="email" name="email" class="form-control" id="email" placeholder="อีเมล">
+            </div>
+            <div class="form-group form-inline">
+                <input type="password" name="password" class="form-control" id="pwd" placeholder="รหัสผ่าน">
+                <input type="password" name="cpassword" class="form-control" id="cpwd" placeholder="ยืนยันรหัสผ่าน">
+            </div>
+            <div class="form-group button form-inline">
+                <input type="submit" value="ลงทะเบียน">
+            </div>
+            <div class="form-link">
+                มีบัญชีใช่หรือไม่?
+                <a href="{{ url_for('login.loginpage') }}"> เข้าสู่ระบบ</a>
+
+        </form>
+    </div>
+    </div>
+</body>
+
+</html>

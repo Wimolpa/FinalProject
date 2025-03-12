@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finding Forest Fire</title>
+    <style>
+        body {
+            background-image: url('https://cdn.pixabay.com/photo/2024/01/13/09/49/jungle-8505432_1280.jpg');
+            background-size: cover;
+            background-position: center;
+            min-height: 600px;
+        }
+    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <div class="appbar">
+        <a href="{{ url_for('home.homepage') }}" class="column">ติดต่อ</a>
+        <a href="{{ url_for('home.homepage') }}" class="column">หน้าหลัก</a>
+    </div>
+
+    <div class="flex-container">
+        <div class="item">
+            <a class="font">ค้นหาตำแหน่งที่เกิดไฟป่า</a>
+            <br>
+            <a class="font">โดยใช้อินเทอร์เน็ตทุกสรรพสิ่ง</a>
+            <br>
+            <a class="font2">Finding the
+                location of Forest Fire using the Internet of
+                Things (IoT)</a>
+        </div>
+    </div>
+    <div class="item">
+
+        <button class="button1" type="button"
+            onclick="window.location.href='{{ url_for( 'login.loginpage' ) }}';">เข้าสู่ระบบ</button>
+        <button class="button2" type="button"
+            onclick="window.location.href='{{ url_for( 'register.registerpage' ) }}';">ลงทะเบียน</button>
+
+    </div>
+
+
+</body>
+
+</html>

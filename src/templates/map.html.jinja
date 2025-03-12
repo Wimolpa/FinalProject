@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Map</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            padding: 0;
+            margin: 0;
+        }
+
+        .navbar {
+            display: flex;
+            width: auto;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #333;
+            font-family: Arial, Helvetica, sans-serif;
+            padding: 0 20px;
+            margin-bottom: 0;
+        }
+
+        .navbar .fa-user {
+            color: white;
+            display: inline-block;
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown .dropbtn {
+            cursor: pointer;
+            font-size: 16px;
+            border: none;
+            outline: none;
+            color: white;
+            padding: 14px 16px;
+            background-color: inherit;
+            font-family: inherit;
+
+        }
+
+        .navbar a:hover,
+        .dropdown:hover .dropbtn,
+        .dropbtn:focus {
+            background-color: #0A5c36;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 280px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            left: 1100px;
+        }
+
+        .dropdown-content a {
+            float: none;
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+
+        }
+
+        .dropdown-content a:hover {
+            background-color: #ddd;
+        }
+
+        .show {
+            display: block;
+        }
+
+        .modal_m {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding-top: 60px;
+        }
+
+        .modal_m-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+    <script>
+
+        function myFunction() {
+            document.getElementById("myDropdown").classList.toggle("show");
+        }
+
+        // Close the dropdown if the user clicks outside of it
+        window.onclick = function (event) {
+            if (!event.target.matches('.dropbtn')) {
+                var dropdowns = document.getElementsByClassName("dropdown-content");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+
+
+        // Function to close the modal
+        function closeModal() {
+            document.getElementById("myModal").style.display = "none";
+        }
+
+        // Close the modal if clicked outside
+        window.onclick = function (event) {
+            var modal = document.getElementById("myModal");
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+
+    </script>
+</head>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<body style="background-color:white;">
+
+    <div class="navbar">
+        <p class="fa fa-user" style="margin-left: 20px; font-size: 16px"> {{ session['username'] }} </p>
+        <div class="dropdown">
+            <button class="dropbtn" onclick="myFunction()" style="margin-left: 1330px;">
+                <i class="fa fa-bars"></i>
+            </button>
+            <div class="dropdown-content" id="myDropdown">
+                {% for row in data %}
+                <a href="#" data-row='{{ row | tojson }}' onclick="openModal(this)">{{ row[1] }}</a>
+                {% endfor %}
+                <a href="#" id="showSensors">เพิ่มโหนดเซ็นเซอร์</a>
+                <a href="{{ url_for('home.homepage') }}"><i class="fa fa-sign-out"></i>
+                    Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal" style="margin: 100px; width: 1050px;">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <p id="modalText">This is a modal triggered by clicking on dropdown content.</p>
+        </div>
+    </div>
+
+
+    <!-- Modal สำหรับแสดงตารางเซ็นเซอร์ -->
+    <div id="modalSensor" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">รายชื่อโหนดเซ็นเซอร์ (คลิกเพื่อเพิ่ม)</h4>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered" id="sensorTable"
+                        style="margin: 10px; background-color: transparent;">
+                        <thead>
+                            <tr>
+                                <th>Node ID</th>
+                                <th>Node Name</th>
+                                <th>Latitude</th>
+                                <th>Longitude</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sensorTableBody">
+                            {% for sensor in allsensor %}
+                            <tr class="sensorRow" style="cursor: pointer;"
+                                onclick="addSensor('{{ sensor[1] }}', {{ sensor[2] }}, {{ sensor[3] }})">
+                                <td>{{ sensor[0] }}</td>
+                                <td>{{ sensor[1] }}</td>
+                                <td>{{ sensor[2] }}</td>
+                                <td>{{ sensor[3] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <!-- Pagination controls -->
+                    <div id="pagination" style="text-align: center; margin: 10px;">
+                        <button id="prevBtn" class="btn btn-secondary" disabled>ก่อนหน้า</button>
+                        <button id="nextBtn" class="btn btn-secondary">ถัดไป</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">ปิด</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal สำหรับการเพิ่มโหนดเซ็นเซอร์ -->
+    <div id="modalAdd" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background-color: rgba(255, 255, 255, 0.9);">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">เพิ่มโหนดเซ็นเซอร์</h4>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url_for('admin.insert_sensor') }}" method="POST" id="sensorForm">
+                        <input type="hidden" name="user_id" value="{{datauser[0]}}">
+                        <input type="hidden" name="username" value="{{datauser[1]}}">
+                        <input type="hidden" name="password" value="{{datauser[2]}}">
+                        <input type="hidden" name="role" value="{{datauser[3]}}">
+
+                        <div class="form-group">
+                            <label>node_name:</label>
+                            <input type="text" class="form-control" name="node_name" id="node_name" required>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-primary" type="submit">เพิ่มโหนดเซ็นเซอร์</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">ปิด</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let currentPage = 1;
+        const rowsPerPage = 2;
+
+        // ฟังก์ชันแสดงป็อปอัพเซ็นเซอร์
+        document.getElementById("showSensors").addEventListener("click", function () {
+            $('#modalSensor').modal('show'); // แสดงโมดัลที่มีตารางเซ็นเซอร์
+            currentPage = 1; // รีเซ็ตหน้าเป็นหน้าแรก
+            showPage(currentPage); // แสดงหน้าแรกของตาราง
+        });
+
+        function showPage(page) {
+            const rows = document.querySelectorAll('.sensorRow');
+            const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+            // หยุดการแสดงทั้งหมด
+            rows.forEach(row => row.style.display = 'none');
+
+            // คำนวณ index สำหรับการแสดงผล
+            const start = (page - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+
+            // แสดงเฉพาะแถวที่อยู่ในช่วงที่กำหนด
+            for (let i = start; i < end && i < rows.length; i++) {
+                rows[i].style.display = 'table-row';
+            }
+
+            // การจัดการปุ่มถัดไปและก่อนหน้า
+            document.getElementById("prevBtn").disabled = page === 1;
+            document.getElementById("nextBtn").disabled = page === totalPages;
+        }
+
+        // ฟังก์ชันสำหรับปุ่มถัดไป
+        document.getElementById("nextBtn").addEventListener("click", function () {
+            const totalPages = Math.ceil(document.querySelectorAll('.sensorRow').length / rowsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                showPage(currentPage);
+            }
+        });
+
+        // ฟังก์ชันสำหรับปุ่มก่อนหน้า
+        document.getElementById("prevBtn").addEventListener("click", function () {
+            if (currentPage > 1) {
+                currentPage--;
+                showPage(currentPage);
+            }
+        });
+
+        // ฟังก์ชันเลือกเซ็นเซอร์เพื่อเพิ่ม
+        function addSensor(sensorName) {
+            document.getElementById("node_name").value = sensorName; // เพิ่มชื่อเซ็นเซอร์ที่เลือกลงใน input
+            $('#modalAdd').modal('show'); // แสดงโมดัลสำหรับการเพิ่มเซ็นเซอร์
+        }
+    </script>
+
+
+    <div id="map"></div>
+
+    <script>
+        const data = {{ data | tojson }};
+        const fire_location = {{ fire_location | tojson }};
+        //console.log(data);
+        function initMap() {
+            const centerCoordinates = { lat: data[0][2], lng: data[0][3] }; // Map center coordinates
+            const map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 12,
+                center: centerCoordinates,
+                mapId: 'DEMO_MAP_ID'
+            });
+
+            data.forEach(location => {
+                // console.log(location[2], location[3]);
+                // console.log(data);
+                // console.log(fire_location);
+
+                // สร้างไอคอนแบบกำหนดเองด้วยสีที่ต้องการ
+                const customIcon = {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 10,
+                    fillColor: '#3b50ce',
+                    fillOpacity: 1,
+                    strokeWeight: 2,
+                    strokeColor: '#000000'
+                };
+
+                // สร้าง marker ด้วยไอคอนที่กำหนดเอง
+                const marker = new google.maps.Marker({
+                    position: { lat: location[2], lng: location[3] },
+                    map: map,
+                    title: location[1],
+                    icon: customIcon
+                });
+
+                // สร้าง InfoWindow เพื่อแสดงข้อความบนหัว marker
+                const infoWindow = new google.maps.InfoWindow({
+                    content: `<div><strong>${location[1]}</strong><br>Lat: ${location[2]}<br>Lng: ${location[3]}</div>`
+                });
+
+                // แสดง InfoWindow ทันทีเมื่อสร้าง marker
+                infoWindow.open(map, marker);
+
+                // หรือแสดง InfoWindow เมื่อคลิกที่ marker
+                marker.addListener('click', function () {
+                    infoWindow.open(map, marker);
+                });
+            });
+
+            // สร้าง marker เพิ่มเติมที่ตำแหน่ง latc และ lonc ด้วยไอคอนสีแดง
+            fire_location.forEach(location => {
+                console.log(location[0][1], location[0][2]);
+                const redIcon = {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 10,
+                    fillColor: '#ff0000',
+                    fillOpacity: 1,
+                    strokeWeight: 2,
+                    strokeColor: '#000000'
+                };
+
+                const markerRed = new google.maps.Marker({
+                    position: { lat: location[1], lng: location[2] },
+                    map: map,
+                    title: 'ตำแหน่งไฟป่าที่คำนวณได้',
+                    icon: redIcon
+                });
+
+                const infoWindowRed = new google.maps.InfoWindow({
+                    content: `<div><strong>ตำแหน่งไฟป่าที่คำนวณได้</strong><br>Lat: ${location[1]}<br>Lng: ${location[2]}</div>`
+                });
+
+                // แสดง InfoWindow ทันทีเมื่อสร้าง marker
+                infoWindowRed.open(map, markerRed);
+
+                // แสดง InfoWindow เมื่อคลิกที่ marker
+                markerRed.addListener('click', function () {
+                    infoWindowRed.open(map, markerRed);
+                });
+            });
+
+            // สร้าง marker เพิ่มเติมที่ตำแหน่ง ด้วยไอคอนเขียว
+            // const greenIcon = {
+            //  path: google.maps.SymbolPath.CIRCLE,
+            //  scale: 10,
+            //  fillColor: '#0a8f08',
+            //  fillOpacity: 1,
+            //  strokeWeight: 2,
+            //  strokeColor: '#000000'
+            //  };
+
+            // const markerGreen = new google.maps.Marker({
+            //  position: { lat: 19.44577, lng: 99.68581 },
+            //   map: map,
+            //   title: 'ตำแหน่งไฟป่าที่เกิดขึ้นจริง',
+            //   icon: greenIcon
+            //  });
+
+            // const infoWindowGreen = new google.maps.InfoWindow({
+            //    content: `<div><strong>ตำแหน่งไฟป่าที่เกิดขึ้นจริง</strong><br>Lat:19.44577<br>Lng:99.68581</div>`
+            // });
+
+            // แสดง InfoWindow ทันทีเมื่อสร้าง marker
+            // infoWindowGreen.open(map, markerGreen);
+
+            // แสดง InfoWindow เมื่อคลิกที่ marker
+            // markerGreen.addListener('click', function () {
+            //     infoWindowGreen.open(map, markerGreen);
+            // });
+        }
+
+    </script>
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBtpuNRPRhjubNotVoqEKJO8pFxI2woX8A&callback=initMap">
+        </script>
+
+    <script>
+
+        function openModal(element) {
+            const rowData = JSON.parse(element.getAttribute('data-row')); // ดึงข้อมูลจาก data-row
+            let modalContent = `
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>node_name</th>
+                <th>gps_lat</th>
+                <th>gps_lon</th>
+                <th>PM2.5</th>
+                <th>Wind direction</th>
+                <th>Wind speed</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Add By</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>${rowData[1]}</td> <!-- node_name -->
+                <td>${rowData[2]}</td> <!-- gps_lat -->
+                <td>${rowData[3]}</td> <!-- gps_lon -->
+                <td>${rowData[4]}</td> <!-- PM2.5 -->
+                <td>${rowData[5]}</td> <!-- Wind direction -->
+                <td>${rowData[6]}</td> <!-- Wind speed -->
+                <td>${rowData[7]}</td> <!-- Date -->
+                <td>${rowData[8]}</td> <!-- Time -->
+                <td>${rowData[9]}</td> <!-- Add By -->
+            </tr>
+        </tbody>
+    </table>
+    <a href="#" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modaledit${rowData[0]}"
+        style="display: inline-block;margin-left: 7px; margin-right: 3px;">Edit</a>
+    <div id="modaledit${rowData[0]}" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">อัพเดทข้อมูล</h4>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url_for('admin.edit_sensor') }}" method="POST">
+                        <div class="form-group">
+                            <label>node_name:</label>
+                            <input type="hidden" name="user_id" value="{{datauser[0]}}">
+                            <input type="hidden" name="username" value="{{datauser[1]}}">
+                            <input type="hidden" name="password" value="{{datauser[2]}}">
+                            <input type="hidden" name="role" value="{{datauser[3]}}">
+                            <input type="hidden" name="id" value="${rowData[0]}">
+                            <input type="text" class="form-control" name="node_name" value="${rowData[1]}">
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-primary" type="submit">อัพเดท</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">ปิด</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form action="{{ url_for('admin.deletess') }}" method="POST" style="display: inline;">
+        <input type="hidden" name="user_id" value="{{datauser[0]}}">
+        <input type="hidden" name="username" value="{{datauser[1]}}">
+        <input type="hidden" name="password" value="{{datauser[2]}}">
+        <input type="hidden" name="role" value="{{datauser[3]}}">
+        <input type="hidden" name="id" value="${rowData[0]}">
+        <button button class="btn btn-danger btn-xs" type="submit"
+            onclick="return confirm('คุณต้องการลบข้อมูลหรือไม่?')"> Delete</button>
+    </form>
+    `;
+
+
+            document.getElementById("modalText").innerHTML = modalContent; // กำหนดข้อความใน modal
+            document.getElementById("myModal").style.display = "block"; // แสดง modal
+        }
+
+
+        function closeModal() {
+            document.getElementById("myModal").style.display = "none"; // ซ่อน modal
+        }
+
+        window.onclick = function (event) {
+            const modal = document.getElementById("myModal");
+            if (event.target == modal) {
+                modal.style.display = "none"; // ซ่อน modal
+            }
+        }
+    </script>
+
+</body>
+
+</html>
